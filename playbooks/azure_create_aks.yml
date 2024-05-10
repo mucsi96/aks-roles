@@ -1,0 +1,17 @@
+- name: Create Azure Kubernetes Service
+  hosts: localhost
+  connection: local
+  vars:
+    resource_group: myResourceGroup
+    location: eastus
+    aks_name: myAKSCluster
+    username: azureuser
+    ssh_key: "your_ssh_key"
+    client_id: "your_client_id"
+    client_secret: "your_client_secret"
+    aks_version: aks_version
+  tasks:
+    - name: Create resource group
+      azure_rm_resourcegroup:
+        name: "{{ resource_group }}"
+        location: "{{ location }}"
