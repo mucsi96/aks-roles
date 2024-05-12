@@ -13,14 +13,24 @@
       "problemMatcher": []
     },
     {
-        "type": "shell",
-        "command": "bash",
-        "label": "Install dependencies",
-        "args": ["scripts/install_dependencies.sh"],
-        "options": {
-          "cwd": "${workspaceFolder}"
-        },
-        "problemMatcher": []
-      }
+      "type": "shell",
+      "command": "bash",
+      "label": "Install dependencies",
+      "args": ["scripts/install_dependencies.sh"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "type": "shell",
+      "command": "az",
+      "label": "Login to Azure",
+      "args": ["login"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    }
   ]
 }
