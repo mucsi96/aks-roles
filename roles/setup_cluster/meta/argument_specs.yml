@@ -11,7 +11,7 @@ argument_specs:
       azure_vm_size:
         type: str
         required: true
-      kubernetes_version:
+      k8s_version:
         type: str
         required: true
       

@@ -2,6 +2,5 @@
   delegate_to: localhost
   azure_rm_resourcegroup:
     name: "{{ azure_resource_group }}"
-    location: "{{ azure_location }}"
     state: absent
-    force_delete_nonempty: True
+    force_delete_nonempty: true

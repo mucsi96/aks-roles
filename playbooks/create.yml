@@ -3,5 +3,6 @@
   vars_files:
     - ../vars/defaults.yaml
   roles:
-    - role: setup_cluster
+    # - role: setup_cluster
+    - role: pull_kube_admin_config
     

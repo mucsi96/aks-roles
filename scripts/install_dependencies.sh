@@ -2,4 +2,4 @@
 
 brew update && brew install azure-cli
 
-pip install -r requirements.txtazure 
+pip install -r requirements.txt

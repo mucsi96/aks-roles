@@ -1,0 +1,33 @@
+- name: Load k3s config
+  delegate_to: localhost
+  azure_rm_aks_info:
+    name: "{{ azure_resource_group }}"
+    resource_group: "{{ azure_resource_group }}"
+    show_kubeconfig: admin
+  register: k8s_config_raw
+
+- name: Create admin config folder
+  delegate_to: localhost
+  ansible.builtin.file:
+    path: "{{ k8s_admin_config_path | dirname }}"
+    state: directory
+    mode: 0700
+
+- name: Create admin config
+  delegate_to: localhost
+  ansible.builtin.copy:
+    dest: "{{ k8s_admin_config_path }}"
+    content: "{{ k8s_config_raw.aks[0].kube_config }}"
+    mode: 0600
+  vars:
+    k8s_ca_cert: "{{ k8s_config.clusters.0.cluster['certificate-authority-data'] }}"
+    k8s_client_cert: "{{ k8s_config.users.0.user['client-certificate-data'] }}"
+    k8s_client_key: "{{ k8s_config.users.0.user['client-key-data'] }}"
+
+- name: Get node details
+  delegate_to: localhost
+  kubernetes.core.k8s_info:
+    kubeconfig: "{{ k8s_admin_config_path }}"
+    kind: Node
+  register: this
+  failed_when: "'linux' != this.resources[0].status.nodeInfo.operatingSystem"

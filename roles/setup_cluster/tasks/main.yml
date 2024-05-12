@@ -25,7 +25,7 @@
     name: "{{ azure_resource_group }}"
     resource_group: "{{ azure_resource_group }}"
     dns_prefix: "{{ azure_resource_group }}"
-    kubernetes_version: "{{ kubernetes_version }}"
+    kubernetes_version: "{{ k8s_version }}"
     agent_pool_profiles:
       - name: default
         count: 1
