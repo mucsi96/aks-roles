@@ -15,6 +15,16 @@
     {
       "type": "shell",
       "command": "bash",
+      "label": "Cleanup",
+      "args": ["scripts/cleanup.sh"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "type": "shell",
+      "command": "bash",
       "label": "Install dependencies",
       "args": ["scripts/install_dependencies.sh"],
       "options": {

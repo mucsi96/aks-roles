@@ -1,2 +1,4 @@
 azure_resource_group: cloud-roles
-azure_location: centralus
+azure_location: centralindia
+azure_vm_size: Standard_B4pls_v2
+kubernetes_version: 1.29.4

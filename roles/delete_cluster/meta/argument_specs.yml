@@ -8,10 +8,4 @@ argument_specs:
       azure_location:
         type: str
         required: true
-      azure_vm_size:
-        type: str
-        required: true
-      kubernetes_version:
-        type: str
-        required: true
       

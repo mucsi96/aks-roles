@@ -8,16 +8,29 @@
   azure_rm_virtualnetwork:
     resource_group: "{{ azure_resource_group }}"
     name: "{{ azure_resource_group }}"
-    address_prefixes_cidr:
-      - 10.0.0.0/12
+    address_prefixes_cidr: 10.0.0.0/12
 - name: Create subnet
   delegate_to: localhost
   azure_rm_subnet:
     resource_group: "{{ azure_resource_group }}"
     virtual_network_name: "{{ azure_resource_group }}"
     name: "{{ azure_resource_group }}"
-    address_prefixes_cidr:
-      - 10.1.0.0/16
+    address_prefixes_cidr: 10.1.0.0/16
   register: subnet
 - debug:
     msg: "Subnet id: {{ subnet.state.id }}"
+- name: Create Kubernetes cluster
+  delegate_to: localhost
+  azure_rm_aks:
+    name: "{{ azure_resource_group }}"
+    resource_group: "{{ azure_resource_group }}"
+    dns_prefix: "{{ azure_resource_group }}"
+    kubernetes_version: "{{ kubernetes_version }}"
+    agent_pool_profiles:
+      - name: default
+        count: 1
+        mode: System
+        vm_size: "{{ azure_vm_size }}"
+        vnet_subnet_id: "{{ subnet.state.id }}"
+    network_profile:
+      network_plugin: azure

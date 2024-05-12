@@ -1,0 +1,7 @@
+- name: Delete Azure Kubernetes Cluster
+  hosts: azure
+  vars_files:
+    - ../vars/defaults.yaml
+  roles:
+    - role: delete_cluster
+    
