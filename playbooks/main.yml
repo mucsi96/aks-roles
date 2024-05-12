@@ -1,0 +1,7 @@
+- name: Create Azure Kubernetes Cluster
+  hosts: azure
+  vars_files:
+    - ../vars/defaults.yaml
+  roles:
+    - role: setup_cluster
+    

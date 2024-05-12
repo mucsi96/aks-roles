@@ -1,4 +1,5 @@
 #!/bin/bash
 
-ansible-playbook \
-    playbooks/azure_create_aks.yml
+export ANSIBLE_CONFIG=ansible.cfg
+
+ansible-playbook playbooks/main.yml
