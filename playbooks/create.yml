@@ -4,5 +4,7 @@
     - ../vars/defaults.yaml
   roles:
     # - role: setup_cluster
-    - role: pull_kube_admin_config
+    # - role: pull_kube_admin_config
+    # - role: create_app_namespace
+    - role: pull_kube_user_config
     

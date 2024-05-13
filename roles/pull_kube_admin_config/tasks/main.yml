@@ -19,14 +19,10 @@
     dest: "{{ k8s_admin_config_path }}"
     content: "{{ k8s_config_raw.aks[0].kube_config }}"
     mode: 0600
-  vars:
-    k8s_ca_cert: "{{ k8s_config.clusters.0.cluster['certificate-authority-data'] }}"
-    k8s_client_cert: "{{ k8s_config.users.0.user['client-certificate-data'] }}"
-    k8s_client_key: "{{ k8s_config.users.0.user['client-key-data'] }}"
 
 - name: Get node details
   delegate_to: localhost
-  kubernetes.core.k8s_info:
+  k8s_info:
     kubeconfig: "{{ k8s_admin_config_path }}"
     kind: Node
   register: this

@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Config
+clusters:
+  - name: cluster
+    cluster:
+      server: {{ k8s_server }}
+      certificate-authority-data: {{ k8s_ca_cert }}
+users:
+  - name: user
+    user:
+      token: {{ k8s_client_token }}
+contexts:
+  - name: default
+    context:
+      cluster: cluster
+      name: default
+      user: user
+current-context: default

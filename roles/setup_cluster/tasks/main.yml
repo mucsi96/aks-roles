@@ -26,11 +26,14 @@
     resource_group: "{{ azure_resource_group }}"
     dns_prefix: "{{ azure_resource_group }}"
     kubernetes_version: "{{ k8s_version }}"
+    enable_rbac: true
     agent_pool_profiles:
       - name: default
         count: 1
         mode: System
+        os_disk_size_gb: "{{ azure_vm_disk_size_gb }}"
         vm_size: "{{ azure_vm_size }}"
         vnet_subnet_id: "{{ subnet.state.id }}"
     network_profile:
       network_plugin: azure
+    # state: absent
