@@ -1,0 +1,11 @@
+- name: Deploy Traeffik
+  kubernetes.core.helm:
+    kubeconfig: "{{ k8s_admin_config_path }}"
+    name: traefik
+    chart_repo_url: https://traefik.github.io/charts
+    chart_ref: traefik
+    chart_version: "{{ traefik_chart_version }}"
+    wait: true
+    release_namespace: traefik
+    create_namespace: true
+    # release_values:

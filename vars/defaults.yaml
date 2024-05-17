@@ -6,3 +6,4 @@ k8s_version: 1.29.4
 k8s_admin_config_path: "{{ inventory_dir }}/.kube/admin-config"
 k8s_user_config_path: "{{ inventory_dir }}/.kube/user-config"
 k8s_namespace: test
+traefik_chart_version: 28.0.0

@@ -41,6 +41,15 @@
         "cwd": "${workspaceFolder}"
       },
       "problemMatcher": []
+    },
+    {
+      "type": "shell",
+      "command": "open http://localhost:9000/dashboard/ && kubectl --kubeconfig .kube/admin-config port-forward $(kubectl --kubeconfig .kube/admin-config get pods --selector \"app.kubernetes.io/name=traefik\" --output=name) 9000:9000",
+      "label": "Open Traeffik dashboard",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
     }
   ]
 }
