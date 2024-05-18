@@ -3,12 +3,18 @@
   azure_rm_resourcegroup:
     name: "{{ azure_resource_group }}"
     location: "{{ azure_location }}"
+
 - name: Create a virtual network
   delegate_to: localhost
   azure_rm_virtualnetwork:
     resource_group: "{{ azure_resource_group }}"
     name: "{{ azure_resource_group }}"
     address_prefixes_cidr: 10.0.0.0/12
+  register: azure_virtual_network_info
+
+- set_fact:
+    azure_virtual_network_id: "{{ azure_virtual_network_info.state.id }}"
+
 - name: Create subnet
   delegate_to: localhost
   azure_rm_subnet:
@@ -17,8 +23,10 @@
     name: "{{ azure_resource_group }}"
     address_prefixes_cidr: 10.1.0.0/16
   register: subnet
-- debug:
-    msg: "Subnet id: {{ subnet.state.id }}"
+
+- set_fact:
+    azure_subnet_id: "{{ subnet.state.id }}"
+
 - name: Create Kubernetes cluster
   delegate_to: localhost
   azure_rm_aks:
@@ -33,7 +41,50 @@
         mode: System
         os_disk_size_gb: "{{ azure_vm_disk_size_gb }}"
         vm_size: "{{ azure_vm_size }}"
-        vnet_subnet_id: "{{ subnet.state.id }}"
+        vnet_subnet_id: "{{ azure_subnet_id }}"
     network_profile:
       network_plugin: azure
+      load_balancer_sku: basic
     # state: absent
+
+- name: Get AKS info
+  delegate_to: localhost
+  azure_rm_aks_info:
+    name: "{{ azure_resource_group }}"
+    resource_group: "{{ azure_resource_group }}"
+  register: azure_aks_info
+
+- set_fact:
+    azure_principal_id: "{{ azure_aks_info.aks[0].identity.principal_id }}"
+    azure_node_resource_group: "{{ azure_aks_info.aks[0].node_resource_group }}"
+
+- name: Get node resource group info
+  azure_rm_resourcegroup_info:
+    name: "{{ azure_node_resource_group }}"
+  register: azure_node_resource_group_info
+
+- set_fact:
+    azure_node_resource_group_id: "{{ azure_node_resource_group_info.resourcegroups[0].id }}"
+
+- name: Get Network Contributor Role Definition
+  azure_rm_roledefinition_info:
+    scope: "{{ azure_virtual_network_id }}"
+    role_name: "Network Contributor"
+  register: azure_network_contributor_role_definition_info
+
+- set_fact:
+    azure_network_contributor_role_definition_id: "{{ azure_network_contributor_role_definition_info.roledefinitions[0].id }}"
+
+- name: Ensure cluster identity has delegated permissions to public IP's resource group
+  azure_rm_roleassignment:
+    assignee_object_id: "{{ azure_principal_id }}"
+    role_definition_id: "{{ azure_network_contributor_role_definition_id }}"
+    scope: "{{ azure_node_resource_group_id }}"
+
+- name: Create static IP address
+  azure_rm_publicipaddress:
+    resource_group: "{{ azure_node_resource_group }}"
+    name: "{{ azure_resource_group }}"
+    allocation_method: static
+    sku: Basic
+  register: public_ip_address
