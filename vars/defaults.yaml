@@ -1,4 +1,4 @@
-azure_resource_group: cloud-roles
+azure_resource_group: p01
 azure_location: centralindia
 azure_vm_size: Standard_B4pls_v2
 azure_vm_disk_size_gb: 30
