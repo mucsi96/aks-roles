@@ -25,7 +25,7 @@ rules:
       - create
       - patch
   - apiGroups:
-      - traefik.containo.us
+      - traefik.io
     resources: 
       - ingressroutes
       - middlewares

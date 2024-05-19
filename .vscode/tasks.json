@@ -6,7 +6,17 @@
       "type": "shell",
       "command": "bash",
       "label": "Provision",
-      "args": ["scripts/provision.sh"],
+      "args": ["scripts/run_playbook.sh", "playbooks/create.yml"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "type": "shell",
+      "command": "bash",
+      "label": "Deploy demo",
+      "args": ["scripts/run_playbook.sh", "playbooks/deploy_demo.yml"],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -16,7 +26,7 @@
       "type": "shell",
       "command": "bash",
       "label": "Cleanup",
-      "args": ["scripts/cleanup.sh"],
+      "args": ["scripts/run_playbook.sh", "playbooks/delete.yml"],
       "options": {
         "cwd": "${workspaceFolder}"
       },
