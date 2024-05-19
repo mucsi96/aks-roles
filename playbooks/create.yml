@@ -5,4 +5,4 @@
   roles:
     # - role: setup_cluster
     # - role: pull_kube_admin_config
-    # - role: deploy_ingress_controller
+    - role: deploy_ingress_controller

@@ -8,6 +8,17 @@
 - set_fact:
     azure_node_resource_group: "{{ azure_aks_info.aks[0].node_resource_group }}"
 
+- name: Get public DNS name
+  delegate_to: localhost
+  azure_rm_publicipaddress_info:
+    resource_group: "{{ azure_node_resource_group }}"
+    name: "{{ azure_resource_group }}"
+  register: azure_public_ip_info
+
+- set_fact:
+    azure_public_dns_name: "{{ azure_public_ip_info.publicipaddresses[0].dns_settings.fqdn }}"
+    azure_public_ip: "{{ azure_public_ip_info.publicipaddresses[0].ip_address }}"
+
 - name: Deploy Traeffik
   kubernetes.core.helm:
     kubeconfig: "{{ k8s_admin_config_path }}"
@@ -20,20 +31,8 @@
     create_namespace: true
     release_values:
       service:
+        spec:
+          loadBalancerIP: "{{ azure_public_ip }}"
         annotations:
           service.beta.kubernetes.io/azure-load-balancer-resource-group: "{{ azure_node_resource_group }}"
-          service.beta.kubernetes.io/azure-pip-name: "{{ azure_resource_group }}"
-          service.beta.kubernetes.io/azure-dns-label-name: "{{ azure_resource_group }}"
 
-- name: Get public DNS name
-  delegate_to: localhost
-  azure_rm_publicipaddress_info:
-    resource_group: "{{ azure_node_resource_group }}"
-    name: "{{ azure_resource_group }}"
-  register: azure_public_ip_info
-
-- set_fact:
-    azure_public_dns_name: "{{ azure_public_ip_info.publicipaddresses[0].dns_settings.fqdn }}"
-
-- debug:
-    var: azure_public_dns_name

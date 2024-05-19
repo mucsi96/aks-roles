@@ -1,15 +1,15 @@
 - name: Get Docker Hub Token
-  ansible.builtin.uri:
+  uri:
     url: "https://auth.docker.io/token?service=registry.docker.io&scope=repository:{{ image }}:pull"
     method: GET
   register: docker_hub_token_result
 
 - name: Extract Docker Hub Token
-  ansible.builtin.set_fact:
+  set_fact:
     docker_hub_token: "{{ docker_hub_token_result.json.access_token }}"
 
 - name: Get Docker Hub Image Information
-  ansible.builtin.uri:
+  uri:
     url: "https://registry-1.docker.io/v2/{{ image }}/tags/list"
     method: GET
     headers:
@@ -17,13 +17,13 @@
   register: docker_hub_image_info_result
 
 - name: Filter out "latest" tag
-  ansible.builtin.set_fact:
+  set_fact:
     non_latest_tags: "{{ docker_hub_image_info_result.json.tags | reject('search', '^latest$') | list }}"
 
 - name: Extract latest version
-  ansible.builtin.set_fact:
+  set_fact:
     latest_image: "{{ image }}:{{ non_latest_tags | community.general.version_sort | last }}"
 
 - name: Latest image is {{ latest_image }}
-  ansible.builtin.debug:
+  debug:
     msg: ""

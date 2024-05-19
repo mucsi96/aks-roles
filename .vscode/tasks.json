@@ -5,7 +5,7 @@
     {
       "type": "shell",
       "command": "bash",
-      "label": "Provision",
+      "label": "Create cluster",
       "args": ["scripts/run_playbook.sh", "playbooks/create.yml"],
       "options": {
         "cwd": "${workspaceFolder}"
@@ -54,7 +54,7 @@
     },
     {
       "type": "shell",
-      "command": "open http://localhost:9000/dashboard/ && kubectl --kubeconfig .kube/admin-config port-forward $(kubectl --kubeconfig .kube/admin-config get pods --selector \"app.kubernetes.io/name=traefik\" --output=name) 9000:9000",
+      "command": "open http://localhost:9000/dashboard/ && kubectl --kubeconfig .kube/admin-config port-forward $(kubectl --kubeconfig .kube/admin-config get pods --namespace traefik --output=name) 9000:9000",
       "label": "Open Traeffik dashboard",
       "options": {
         "cwd": "${workspaceFolder}"
