@@ -68,7 +68,7 @@
 
 - name: Get Network Contributor Role Definition
   azure_rm_roledefinition_info:
-    scope: "{{ azure_virtual_network_id }}"
+    scope: "{{ azure_virtual_network_subnet_id }}"
     role_name: "Network Contributor"
   register: azure_network_contributor_role_definition_info
 
@@ -79,7 +79,11 @@
   azure_rm_roleassignment:
     assignee_object_id: "{{ azure_principal_id }}"
     role_definition_id: "{{ azure_network_contributor_role_definition_id }}"
-    scope: "{{ azure_virtual_network_subnet_id }}"
+    scope: "{{ azure_node_resource_group_id }}"
+
+- name: Pause for 10 seconds for role assignment to take effect
+  ansible.builtin.pause:
+    seconds: 10
 
 - name: Create static IP address
   azure_rm_publicipaddress:
