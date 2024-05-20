@@ -2,6 +2,7 @@
   hosts: azure
   vars_files:
     - ../vars/defaults.yaml
+    - ../vars/vault.yaml
   roles:
     # - role: setup_cluster
     # - role: pull_kube_admin_config

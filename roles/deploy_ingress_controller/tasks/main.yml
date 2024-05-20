@@ -29,12 +29,35 @@
     release_namespace: traefik
     create_namespace: true
     release_values:
+      # logs:
+      #   general:
+      #     level: DEBUG
+      #   access:
+      #     enabled: true
+      ports:
+        web:
+          redirectTo: 
+            port: websecure
+            scheme: https
+        #   middlewares: traefik-ip-filter@kubernetescrd
+        # websecure:
+        #   middlewares: traefik-ip-filter@kubernetescrd
       service:
         spec:
-          loadBalancerIP: "{{ azure_public_ip }}"
+          type: LoadBalancer
         annotations:
           service.beta.kubernetes.io/azure-load-balancer-resource-group: "{{ azure_node_resource_group }}"
+          service.beta.kubernetes.io/azure-pip-name: "{{ azure_resource_group }}"
           service.beta.kubernetes.io/azure-dns-label-name: "{{ azure_resource_group }}"
+          service.beta.kubernetes.io/azure-allowed-ip-ranges: "{{ ip_range | join(',') }}"
+      # extraObjects:
+      # - apiVersion: traefik.io/v1alpha1
+      #   kind: Middleware
+      #   metadata:
+      #     name: ip-filter
+      #   spec:
+      #     ipAllowList:
+      #       sourceRange: "{{ ip_range }}"
 
 # - name: Get an existing Service object
 #   kubernetes.core.k8s_info:

@@ -8,4 +8,8 @@ argument_specs:
       traefik_chart_version:
         type: str
         required: true
+      ip_range:
+        type: list
+        elements: str
+        required: true
       
