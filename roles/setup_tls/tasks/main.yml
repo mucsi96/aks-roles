@@ -18,9 +18,54 @@
   azure.azcollection.azure_rm_dnszone:
     resource_group: "{{ azure_resource_group }}"
     name: "{{ dns_zone }}"
+  register: dns_zone_info
+
+- set_fact:
+    azure_dns_challenge_application_secret: >-
+      {{
+        lookup('ansible.builtin.password', '/dev/null', length=50, seed='{{ inventory_hostname }}-{{ username }}-password')
+      }}
+
+- debug:
+    var: azure_dns_challenge_application_secret
 
 - name: Create dns challenge application
   delegate_to: localhost
   azure.azcollection.azure_rm_adapplication:
     tenant: "{{ azure_tenant_id }}"
+    available_to_other_tenants: true
     display_name: dns-challenge
+    credential_description: dns-challenge
+    key_type: Password
+    password: "{{ azure_dns_challenge_application_secret }}"
+  when: dns_zone_info.changed
+
+- name: Get dns challenge application info
+  delegate_to: localhost
+  azure.azcollection.azure_rm_adapplication_info:
+    tenant: "{{ azure_tenant_id }}"
+  register: azure_dns_challenge_application_info
+
+- name: Find app_id by identifier URI
+  set_fact:
+    azure_dns_challenge_application_id: >-
+      {{
+        (azure_dns_challenge_application_info.applications
+        | selectattr('app_display_name', 'contains', 'dns-challenge')
+        | map(attribute='app_id')
+        | list
+        | first)
+      }}
+
+- debug:
+    var: azure_dns_challenge_application_id
+
+- name: Create dns challenge service principal
+  delegate_to: localhost
+  azure.azcollection.azure_rm_adserviceprincipal:
+    tenant: "{{ azure_tenant_id }}"
+    app_id: "{{ azure_dns_challenge_application_id }}"
+  register: dns_challenge_service_principal
+
+- debug:
+    var: dns_challenge_service_principal
