@@ -20,6 +20,18 @@
     name: "{{ dns_zone }}"
   register: dns_zone_info
 
+- name: Get DNS Zone Contributor Role Definition
+  azure.azcollection.azure_rm_roledefinition_info:
+    scope: "{{ dns_zone_info.state.id }}"
+    role_name: "DNS Zone Contributor"
+  register: azure_dns_zone_contributor_role_definition_info
+
+- set_fact:
+    azure_dns_zone_contributor_role_definition_id: "{{ azure_dns_zone_contributor_role_definition_info.roledefinitions[0].id }}"
+
+- debug:
+    var: azure_dns_zone_contributor_role_definition_id
+
 - set_fact:
     azure_dns_challenge_application_secret: >-
       {{
@@ -65,7 +77,21 @@
   azure.azcollection.azure_rm_adserviceprincipal:
     tenant: "{{ azure_tenant_id }}"
     app_id: "{{ azure_dns_challenge_application_id }}"
-  register: dns_challenge_service_principal
 
-- debug:
-    var: dns_challenge_service_principal
+- name: Get dns challenge service principal info
+  delegate_to: localhost
+  azure.azcollection.azure_rm_adserviceprincipal_info:
+    tenant: "{{ azure_tenant_id }}"
+    app_id: "{{ azure_dns_challenge_application_id }}"
+  register: dns_challenge_service_principal_info
+
+- name: Get node resource group info
+  azure.azcollection.azure_rm_resourcegroup_info:
+    name: "{{ azure_resource_group }}"
+  register: azure_resource_group_info
+
+- name: Set DNS Zone Contributor Role Assignment
+  azure.azcollection.azure_rm_roleassignment:
+    assignee_object_id: "{{ dns_challenge_service_principal_info.service_principals[0].object_id }}"
+    role_definition_id: "{{ azure_dns_zone_contributor_role_definition_id }}"
+    scope: "{{ azure_resource_group_info.resourcegroups[0].id }}"
