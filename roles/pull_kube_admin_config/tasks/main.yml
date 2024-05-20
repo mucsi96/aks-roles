@@ -1,6 +1,6 @@
 - name: Load k3s config
   delegate_to: localhost
-  azure_rm_aks_info:
+  azure.azcollection.azure_rm_aks_info:
     name: "{{ azure_resource_group }}"
     resource_group: "{{ azure_resource_group }}"
     show_kubeconfig: admin

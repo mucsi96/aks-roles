@@ -1,4 +1,8 @@
+- [Azure Python SDK](https://azure.github.io/azure-sdk/releases/latest/all/python.html)
 - [Tutorial: Configure Azure Kubernetes Service (AKS) clusters in Azure using Ansible](https://learn.microsoft.com/en-us/azure/developer/ansible/aks-configure-clusters)
 - [azure.azcollection](https://docs.ansible.com/ansible/latest/collections/azure/azcollection)
 - [IPInfo](https://ipinfo.io/)
-- https://github.com/ipverse/asn-ip
+- [ASN IP ranges](https://github.com/ipverse/asn-ip)
+- [Traefik Proxy Helm Chart](https://github.com/traefik/traefik-helm-chart)
+- [Issue Let’s Encrypt certificate using Azure DNS](https://voyagermesh.com/docs/v2024.3.18/guides/cert-manager/dns01_challenge/azure-dns/)
+- [Host your domain in Azure DNS](https://learn.microsoft.com/en-us/azure/dns/dns-delegate-domain-azure-dns)

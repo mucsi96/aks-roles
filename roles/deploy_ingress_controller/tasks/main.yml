@@ -1,6 +1,6 @@
 - name: Get AKS info
   delegate_to: localhost
-  azure_rm_aks_info:
+  azure.azcollection.azure_rm_aks_info:
     name: "{{ azure_resource_group }}"
     resource_group: "{{ azure_resource_group }}"
   register: azure_aks_info
@@ -10,7 +10,7 @@
 
 - name: Get public IP
   delegate_to: localhost
-  azure_rm_publicipaddress_info:
+  azure.azcollection.azure_rm_publicipaddress_info:
     resource_group: "{{ azure_node_resource_group }}"
     name: "{{ azure_resource_group }}"
   register: azure_public_ip_info
@@ -73,7 +73,7 @@
 
 - name: Get public DNS name
   delegate_to: localhost
-  azure_rm_publicipaddress_info:
+  azure.azcollection.azure_rm_publicipaddress_info:
     resource_group: "{{ azure_node_resource_group }}"
     name: "{{ azure_resource_group }}"
   register: azure_public_ip_info

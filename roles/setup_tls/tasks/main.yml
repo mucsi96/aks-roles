@@ -1,0 +1,26 @@
+- name: Get account info
+  delegate_to: localhost
+  azure.azcollection.azure_rm_account_info:
+  register: azure_account_info
+
+- set_fact:
+    azure_subscription_id: "{{ azure_account_info.account_info.id }}"
+    azure_tenant_id: "{{ azure_account_info.account_info.tenantId }}"
+
+- debug:
+    var: azure_subscription_id
+
+- debug:
+    var: azure_tenant_id
+
+- name: Create DNS zone
+  delegate_to: localhost
+  azure.azcollection.azure_rm_dnszone:
+    resource_group: "{{ azure_resource_group }}"
+    name: "{{ dns_zone }}"
+
+- name: Create dns challenge application
+  delegate_to: localhost
+  azure.azcollection.azure_rm_adapplication:
+    tenant: "{{ azure_tenant_id }}"
+    display_name: dns-challenge
