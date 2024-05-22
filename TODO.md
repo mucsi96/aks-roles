@@ -1,3 +1,1 @@
-- deploy traeffik
 - deploy identity provider (Microsoft Entra ID)
-- Microsoft as DNS provider
