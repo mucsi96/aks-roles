@@ -40,11 +40,11 @@
       certResolvers:
         letsencrypt:
           email: "{{ letsencrypt_email }}"
-          caServer: https://acme-v02.api.letsencrypt.org/directory # Production server
           # caServer: https://acme-staging-v02.api.letsencrypt.org/directory # Staging server
+          caServer: https://acme-v02.api.letsencrypt.org/directory # Production server
           dnsChallenge:
             provider: azuredns
-            delayBeforeCheck: 5
+            delayBeforeCheck: 10
           storage: /data/acme.json
       env:
         - name: AZURE_CLIENT_ID
@@ -87,7 +87,6 @@
         annotations:
           service.beta.kubernetes.io/azure-load-balancer-resource-group: "{{ azure_node_resource_group }}"
           service.beta.kubernetes.io/azure-pip-name: "{{ azure_resource_group }}"
-          service.beta.kubernetes.io/azure-dns-label-name: "{{ azure_resource_group }}"
           service.beta.kubernetes.io/azure-allowed-ip-ranges: "{{ ip_range | join(',') }}"
       extraObjects:
         - apiVersion: v1

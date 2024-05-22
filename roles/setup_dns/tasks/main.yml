@@ -39,6 +39,15 @@
     records:
       - entry: "{{ azure_public_ip_address.publicipaddresses[0].ip_address }}"
 
+- name: Create widlcard DNS CNAME record
+  azure_rm_dnsrecordset:
+    resource_group: "{{ azure_resource_group }}"
+    relative_name: "*.{{ azure_resource_group }}"
+    zone_name: "{{ dns_zone }}"
+    record_type: CNAME
+    records:
+      - entry: "{{ azure_resource_group }}.{{ dns_zone }}"
+
 - name: Get DNS Zone Contributor Role Definition
   azure.azcollection.azure_rm_roledefinition_info:
     scope: "{{ dns_zone_info.state.id }}"
