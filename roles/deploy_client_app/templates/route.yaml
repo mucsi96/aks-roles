@@ -7,6 +7,8 @@ spec:
   entryPoints:
     - web
     - websecure
+  tls:
+    certResolver: letsencrypt
   routes:
     - kind: Rule
       match: Host(`{{ app_host }}`) && PathPrefix(`{{ base_path }}`)

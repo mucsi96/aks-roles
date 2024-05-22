@@ -14,7 +14,7 @@
       vars:
         k8s_name: demo-app
         k8s_namespace: test
-        app_host: "p01.{{ hostname }}"
+        app_host: "{{ hostname }}"
         base_path: /
         image: mucsi96/hello-client
     

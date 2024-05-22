@@ -7,11 +7,15 @@
     azure_subscription_id: "{{ azure_account_info.account_info.id }}"
     azure_tenant_id: "{{ azure_account_info.account_info.tenantId }}"
 
-- debug:
-    var: azure_subscription_id
+- name: Get AKS info
+  delegate_to: localhost
+  azure.azcollection.azure_rm_aks_info:
+    name: "{{ azure_resource_group }}"
+    resource_group: "{{ azure_resource_group }}"
+  register: azure_aks_info
 
-- debug:
-    var: azure_tenant_id
+- set_fact:
+    azure_node_resource_group: "{{ azure_aks_info.aks[0].node_resource_group }}"
 
 - name: Create DNS zone
   delegate_to: localhost
@@ -19,6 +23,21 @@
     resource_group: "{{ azure_resource_group }}"
     name: "{{ dns_zone }}"
   register: dns_zone_info
+
+- name: Get public IP
+  azure.azcollection.azure_rm_publicipaddress_info:
+    resource_group: "{{ azure_node_resource_group }}"
+    name: "{{ azure_resource_group }}"
+  register: azure_public_ip_address
+
+- name: Create DNS A record
+  azure_rm_dnsrecordset:
+    resource_group: "{{ azure_resource_group }}"
+    relative_name: "{{ azure_resource_group }}"
+    zone_name: "{{ dns_zone }}"
+    record_type: A
+    records:
+      - entry: "{{ azure_public_ip_address.publicipaddresses[0].ip_address }}"
 
 - name: Get DNS Zone Contributor Role Definition
   azure.azcollection.azure_rm_roledefinition_info:
@@ -29,17 +48,11 @@
 - set_fact:
     azure_dns_zone_contributor_role_definition_id: "{{ azure_dns_zone_contributor_role_definition_info.roledefinitions[0].id }}"
 
-- debug:
-    var: azure_dns_zone_contributor_role_definition_id
-
 - set_fact:
     azure_dns_challenge_application_secret: >-
       {{
-        lookup('ansible.builtin.password', '/dev/null', length=50, seed='{{ inventory_hostname }}-{{ username }}-password')
+        lookup('ansible.builtin.password', '/dev/null', length=50, seed='{{ azure_subscription_id }}-azure_dns_challenge_application_secret')
       }}
-
-- debug:
-    var: azure_dns_challenge_application_secret
 
 - name: Create dns challenge application
   delegate_to: localhost
@@ -69,14 +82,17 @@
         | first)
       }}
 
-- debug:
-    var: azure_dns_challenge_application_id
-
 - name: Create dns challenge service principal
   delegate_to: localhost
   azure.azcollection.azure_rm_adserviceprincipal:
     tenant: "{{ azure_tenant_id }}"
     app_id: "{{ azure_dns_challenge_application_id }}"
+  register: dns_challenge_service_principal
+
+- name: Pause for 10 seconds
+  ansible.builtin.pause:
+    seconds: 10
+  when: dns_challenge_service_principal.changed
 
 - name: Get dns challenge service principal info
   delegate_to: localhost
@@ -95,3 +111,21 @@
     assignee_object_id: "{{ dns_challenge_service_principal_info.service_principals[0].object_id }}"
     role_definition_id: "{{ azure_dns_zone_contributor_role_definition_id }}"
     scope: "{{ azure_resource_group_info.resourcegroups[0].id }}"
+
+- name: Create Azure secret folder
+  delegate_to: localhost
+  file:
+    path: "{{ inventory_dir }}/.azure"
+    state: directory
+    mode: 0700
+
+- name: Save the dns challenge application secret
+  delegate_to: localhost
+  copy:
+    dest: "{{ inventory_dir }}/.azure/dns-challenge-application-secret.yml"
+    content: |
+      azure_subscription_id: {{ azure_subscription_id }}
+      azure_tenant_id: {{ azure_tenant_id }}
+      azure_dns_challenge_application_id: {{ azure_dns_challenge_application_id }}
+      azure_dns_challenge_application_secret: "{{ azure_dns_challenge_application_secret }}"
+    mode: 0600

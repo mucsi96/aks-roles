@@ -80,10 +80,12 @@
     assignee_object_id: "{{ azure_principal_id }}"
     role_definition_id: "{{ azure_network_contributor_role_definition_id }}"
     scope: "{{ azure_node_resource_group_id }}"
+  register: azure_role_assignment
 
 - name: Pause for 10 seconds for role assignment to take effect
   ansible.builtin.pause:
     seconds: 10
+  when: azure_role_assignment.changed
 
 - name: Create static IP address
   azure.azcollection.azure_rm_publicipaddress:
