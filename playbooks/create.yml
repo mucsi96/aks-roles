@@ -6,5 +6,5 @@
   roles:
     # - role: setup_cluster
     # - role: pull_kube_admin_config
-    - role: setup_dns
+    # - role: setup_dns
     - role: deploy_ingress_controller
