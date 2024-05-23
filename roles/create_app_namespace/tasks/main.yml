@@ -1,13 +1,13 @@
 - name: Create namespace
   delegate_to: localhost
-  k8s:
+  kubernetes.core.k8s:
     kubeconfig: "{{ k8s_admin_config_path }}"
     state: present
     kind: namespace
     name: "{{ k8s_namespace }}"
 - name: Create service account
   delegate_to: localhost
-  k8s:
+  kubernetes.core.k8s:
     kubeconfig: "{{ k8s_admin_config_path }}"
     state: present
     definition: "{{ lookup('template', item) }}"

@@ -12,7 +12,7 @@
 
 - name: Get token secret
   delegate_to: localhost
-  k8s_info:
+  kubernetes.core.k8s_info:
     kubeconfig: "{{ k8s_admin_config_path }}"
     kind: Secret
     name: "{{ k8s_namespace }}-token"
@@ -39,7 +39,7 @@
 
 - name: Check forbidden
   delegate_to: localhost
-  k8s_info:
+  kubernetes.core.k8s_info:
     kubeconfig: "{{ k8s_user_config_path }}"
     kind: Node
   register: this
@@ -47,7 +47,7 @@
 
 - name: Check success
   delegate_to: localhost
-  k8s:
+  kubernetes.core.k8s:
     kubeconfig: "{{ k8s_user_config_path }}"
     state: present
     kind: namespace

@@ -22,7 +22,7 @@
 
 - name: Get node details
   delegate_to: localhost
-  k8s_info:
+  kubernetes.core.k8s_info:
     kubeconfig: "{{ k8s_admin_config_path }}"
     kind: Node
   register: this
