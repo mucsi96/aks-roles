@@ -15,16 +15,6 @@
     {
       "type": "shell",
       "command": "bash",
-      "label": "Deploy demo",
-      "args": ["scripts/run_playbook.sh", "playbooks/deploy_demo.yml"],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "problemMatcher": []
-    },
-    {
-      "type": "shell",
-      "command": "bash",
       "label": "Cleanup",
       "args": ["scripts/run_playbook.sh", "playbooks/delete.yml"],
       "options": {
