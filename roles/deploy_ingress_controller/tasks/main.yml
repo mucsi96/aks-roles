@@ -1,5 +1,5 @@
 - include_vars:
-    file: "{{ inventory_dir }}/.azure/dns-challenge-application-secret.yml"
+    file: "{{ inventory_dir }}/.azure/dns-challenge-app-secret.yml"
 
 - name: Get AKS info
   delegate_to: localhost
@@ -48,7 +48,7 @@
           storage: /data/acme.json
       env:
         - name: AZURE_CLIENT_ID
-          value: "{{ azure_dns_challenge_application_id }}"
+          value: "{{ azure_dns_challenge_app_id }}"
         - name: AZURE_CLIENT_SECRET
           valueFrom:
             secretKeyRef:
@@ -96,7 +96,7 @@
             namespace: traefik
           type: Opaque
           stringData:
-            client-secret: "{{ azure_dns_challenge_application_secret }}"
+            client-secret: "{{ azure_dns_challenge_app_secret }}"
       # - apiVersion: traefik.io/v1alpha1
       #   kind: Middleware
       #   metadata:

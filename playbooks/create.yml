@@ -6,5 +6,9 @@
   roles:
     # - role: setup_cluster
     # - role: pull_kube_admin_config
+    # - role: pull_kube_user_config
+    #   vars:
+    #     k8s_namespace: test
     # - role: setup_dns
-    - role: deploy_ingress_controller
+    # - role: deploy_ingress_controller
+    - role: setup_identity_provider

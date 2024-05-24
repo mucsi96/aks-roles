@@ -1,0 +1,42 @@
+- name: Get account info
+  delegate_to: localhost
+  azure.azcollection.azure_rm_account_info:
+  register: azure_account_info
+
+- set_fact:
+    azure_tenant_id: "{{ azure_account_info.account_info.tenantId }}"
+
+- include_tasks: create_app.yml
+
+- name: Create user
+  delegate_to: localhost
+  azure.azcollection.azure_rm_aduser:
+    tenant: "{{ azure_tenant_id }}"
+    user_principal_name: tom@{{ azure_entra_domain }}
+    mail_nickname: tom
+    display_name: Tom
+    password_profile: "Xobo693684"
+    account_enabled: true
+  register: azure_ad_user
+
+- name: Create Azure secret folder
+  delegate_to: localhost
+  file:
+    path: "{{ inventory_dir }}/.azure"
+    state: directory
+    mode: 0700
+
+- name: Save the dns challenge application secret
+  delegate_to: localhost
+  copy:
+    dest: "{{ inventory_dir }}/.azure/identity-app-secret.yml"
+    content: |
+      azure_subscription_id: {{ azure_subscription_id }}
+      azure_tenant_id: {{ azure_tenant_id }}
+      azure_identity_app_id: {{ azure_identity_app_id }}
+      azure_identity_app_secret: "{{ azure_identity_app_secret }}"
+    mode: 0600
+
+  
+
+

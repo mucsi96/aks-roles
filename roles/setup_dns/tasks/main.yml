@@ -57,45 +57,13 @@
 - set_fact:
     azure_dns_zone_contributor_role_definition_id: "{{ azure_dns_zone_contributor_role_definition_info.roledefinitions[0].id }}"
 
-- set_fact:
-    azure_dns_challenge_application_secret: >-
-      {{
-        lookup('ansible.builtin.password', '/dev/null', length=50, seed='{{ azure_subscription_id }}-azure_dns_challenge_application_secret')
-      }}
-
-- name: Create dns challenge application
-  delegate_to: localhost
-  azure.azcollection.azure_rm_adapplication:
-    tenant: "{{ azure_tenant_id }}"
-    available_to_other_tenants: true
-    display_name: dns-challenge
-    credential_description: dns-challenge
-    key_type: Password
-    password: "{{ azure_dns_challenge_application_secret }}"
-  when: dns_zone_info.changed
-
-- name: Get dns challenge application info
-  delegate_to: localhost
-  azure.azcollection.azure_rm_adapplication_info:
-    tenant: "{{ azure_tenant_id }}"
-  register: azure_dns_challenge_application_info
-
-- name: Find app_id by identifier URI
-  set_fact:
-    azure_dns_challenge_application_id: >-
-      {{
-        (azure_dns_challenge_application_info.applications
-        | selectattr('app_display_name', 'contains', 'dns-challenge')
-        | map(attribute='app_id')
-        | list
-        | first)
-      }}
+- include_tasks: create_app.yml
 
 - name: Create dns challenge service principal
   delegate_to: localhost
   azure.azcollection.azure_rm_adserviceprincipal:
     tenant: "{{ azure_tenant_id }}"
-    app_id: "{{ azure_dns_challenge_application_id }}"
+    app_id: "{{ azure_dns_challenge_app_id }}"
   register: dns_challenge_service_principal
 
 - name: Pause for 10 seconds
@@ -107,7 +75,7 @@
   delegate_to: localhost
   azure.azcollection.azure_rm_adserviceprincipal_info:
     tenant: "{{ azure_tenant_id }}"
-    app_id: "{{ azure_dns_challenge_application_id }}"
+    app_id: "{{ azure_dns_challenge_app_id }}"
   register: dns_challenge_service_principal_info
 
 - name: Get node resource group info
@@ -131,10 +99,10 @@
 - name: Save the dns challenge application secret
   delegate_to: localhost
   copy:
-    dest: "{{ inventory_dir }}/.azure/dns-challenge-application-secret.yml"
+    dest: "{{ inventory_dir }}/.azure/dns-challenge-app-secret.yml"
     content: |
       azure_subscription_id: {{ azure_subscription_id }}
       azure_tenant_id: {{ azure_tenant_id }}
-      azure_dns_challenge_application_id: {{ azure_dns_challenge_application_id }}
-      azure_dns_challenge_application_secret: "{{ azure_dns_challenge_application_secret }}"
+      azure_dns_challenge_app_id: {{ azure_dns_challenge_app_id }}
+      azure_dns_challenge_app_secret: "{{ azure_dns_challenge_app_secret }}"
     mode: 0600

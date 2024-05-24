@@ -1,0 +1,40 @@
+- set_fact:
+    azure_dns_challenge_app_secret: >-
+      {{
+        lookup('ansible.builtin.password', '/dev/null', length=50, seed='{{ azure_subscription_id }}-azure_dns_challenge_app_secret')
+      }}
+
+- name: List all applications
+  delegate_to: localhost
+  azure.azcollection.azure_rm_adapplication_info:
+    tenant: "{{ azure_tenant_id }}"
+  register: azure_ad_apps
+
+- name: Find identity provider application
+  set_fact:
+    azure_dns_challenge_app: "{{ item }}"
+  loop: "{{ azure_ad_apps.applications }}"
+  when: item.app_display_name == 'dns-challenge'
+
+- name: Create dns challenge application
+  delegate_to: localhost
+  azure.azcollection.azure_rm_adapplication:
+    tenant: "{{ azure_tenant_id }}"
+    available_to_other_tenants: true
+    display_name: dns-challenge
+    credential_description: dns-challenge
+    key_type: Password
+    password: "{{ azure_dns_challenge_app_secret }}"
+  when: azure_dns_challenge_app is not defined
+
+- name: List all applications again
+  delegate_to: localhost
+  azure.azcollection.azure_rm_adapplication_info:
+    tenant: "{{ azure_tenant_id }}"
+  register: azure_ad_apps
+
+- name: Find identity provider application again
+  set_fact:
+    azure_dns_challenge_app_id: "{{ item.app_id }}"
+  loop: "{{ azure_ad_apps.applications }}"
+  when: item.app_display_name == 'dns-challenge'

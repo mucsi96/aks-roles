@@ -1,0 +1,43 @@
+- set_fact:
+    azure_identity_app_secret: >-
+      {{
+        lookup('ansible.builtin.password', '/dev/null', length=50, seed='{{ azure_subscription_id }}-azure_identity_app_secret')
+      }}
+
+- name: List all applications
+  delegate_to: localhost
+  azure.azcollection.azure_rm_adapplication_info:
+    tenant: "{{ azure_tenant_id }}"
+  register: azure_ad_apps
+
+- name: Find identity provider application
+  set_fact:
+    azure_identity_app: "{{ item }}"
+  loop: "{{ azure_ad_apps.applications }}"
+  when: item.app_display_name == 'identity-app'
+
+- name: Create identity provider application
+  delegate_to: localhost
+  azure.azcollection.azure_rm_adapplication:
+    tenant: "{{ azure_tenant_id }}"
+    display_name: identity-app
+    credential_description: identity-app
+    key_type: Password
+    password: "{{ azure_identity_app_secret }}"
+  register: azure_identity_app
+  when: azure_identity_app is not defined
+
+- name: List all applications again
+  delegate_to: localhost
+  azure.azcollection.azure_rm_adapplication_info:
+    tenant: "{{ azure_tenant_id }}"
+  register: azure_ad_apps
+
+- name: Find identity provider application again
+  set_fact:
+    azure_identity_app_id: "{{ item.app_id }}"
+  loop: "{{ azure_ad_apps.applications }}"
+  when: item.app_display_name == 'identity-app'
+
+- debug:
+    var: azure_identity_app
