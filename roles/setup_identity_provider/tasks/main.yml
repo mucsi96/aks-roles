@@ -4,6 +4,7 @@
   register: azure_account_info
 
 - set_fact:
+    azure_subscription_id: "{{ azure_account_info.account_info.id }}"
     azure_tenant_id: "{{ azure_account_info.account_info.tenantId }}"
 
 - include_tasks: create_app.yml
@@ -26,7 +27,7 @@
     state: directory
     mode: 0700
 
-- name: Save the dns challenge application secret
+- name: Save the identity application secret
   delegate_to: localhost
   copy:
     dest: "{{ inventory_dir }}/.azure/identity-app-secret.yml"
